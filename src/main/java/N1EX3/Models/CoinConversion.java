@@ -1,46 +1,23 @@
 package N1EX3.Models;
 
 import N1EX3.Models.Interfaces.ICoinConversion;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 public class CoinConversion implements ICoinConversion {
 
     @Override
     public double convertCoin(double quantity, String coin, String coinToConvert) {
-        double coinConvertedValue = quantity;
+        Map<String, Function<Double, Double>> conversionMap = new HashMap<>();
+        conversionMap.put("EUR", coinToConvert.equalsIgnoreCase("USD") ? this::convertEURToUSD : coinToConvert.equalsIgnoreCase("GBP") ? this::convertEURToGBP : d -> d);
+        conversionMap.put("USD", coinToConvert.equalsIgnoreCase("EUR") ? this::convertUSDToEUR : coinToConvert.equalsIgnoreCase("GBP") ? this::convertUSDToGBP : d -> d);
+        conversionMap.put("GBP", coinToConvert.equalsIgnoreCase("EUR") ? this::convertGBPToEUR : coinToConvert.equalsIgnoreCase("USD") ? this::convertGBPToUSD : d -> d);
 
-        switch(coin) {
-            case "EUR":
-                if(coinToConvert.equalsIgnoreCase("USD")) {
-                    coinConvertedValue = convertEURToUSD(quantity);
-                } else if (coinToConvert.equalsIgnoreCase("GBP")) {
-                    coinConvertedValue = convertEURToGBP(quantity);
-                } else {
-                    coinConvertedValue = quantity;
-                }
-                break;
-            case "USD":
-                if(coinToConvert.equalsIgnoreCase("EUR")) {
-                    coinConvertedValue = convertUSDToEUR(quantity);
-                } else if (coinToConvert.equalsIgnoreCase("GBP")) {
-                    coinConvertedValue = convertUSDToGBP(quantity);
-                } else {
-                    coinConvertedValue = quantity;
-                }
-                break;
-            case "GBP":
-                if(coinToConvert.equalsIgnoreCase("EUR")) {
-                    coinConvertedValue = convertGBPToEUR(quantity);
-                } else if (coinToConvert.equalsIgnoreCase("USD")) {
-                    coinConvertedValue = convertGBPToUSD(quantity);
-                } else {
-                    coinConvertedValue = quantity;
-                }
-                break;
-            default:
-                System.out.println("Invalid conversion.");
-                break;
-        }
-        return coinConvertedValue;
+        return conversionMap.getOrDefault(coin, d -> {
+            System.out.println("Invalid conversion.");
+            return quantity;
+        }).apply(quantity);
     }
 
     public double convertEURToUSD(double quantity) {

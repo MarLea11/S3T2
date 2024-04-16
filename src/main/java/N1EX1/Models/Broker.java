@@ -8,13 +8,8 @@ import java.util.List;
 
 public class Broker implements Notifier {
 
-    private final List<Observer> observers;
+    private final List<Observer> observers = new ArrayList<>();
     private double stockStatus;
-
-    public Broker() {
-        observers = new ArrayList<>();
-        stockStatus = 0.0;
-    }
 
     public void notifyObservers() {
 
